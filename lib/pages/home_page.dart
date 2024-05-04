@@ -101,8 +101,151 @@ class IntroPage extends StatelessWidget {
               ),
             ),
             SizedBox(height: 20),
-            Expanded(
-              child: DynamicCardGrid(),
+            Flexible(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: Column(
+                  children: List.generate(
+                    (products.length / 2)
+                        .ceil(), // Divide by 2 to handle odd number of products
+                    (index) {
+                      return Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: buildCardProduct(
+                              products[index * 2]["title"],
+                              products[index * 2]["label"],
+                              products[index * 2]["price"],
+                              products[index * 2]["star"],
+                              products[index * 2]["imgPath"],
+                            ),
+                          ),
+                          SizedBox(width: 10), // Add spacing between cards
+                          Expanded(
+                            child: (index * 2 + 1 < products.length)
+                                ? buildCardProduct(
+                                    products[index * 2 + 1]["title"],
+                                    products[index * 2 + 1]["label"],
+                                    products[index * 2 + 1]["price"],
+                                    products[index * 2 + 1]["star"],
+                                    products[index * 2 + 1]["imgPath"],
+                                  )
+                                : SizedBox(), // In case of odd number of products
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      bottomNavigationBar: Container(
+        margin: EdgeInsets.only(left: 20, right: 20, bottom: 10),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(50)),
+          color: const Color.fromARGB(255, 31, 31, 31),
+          boxShadow: [
+            BoxShadow(
+              color: Color.fromARGB(255, 209, 200, 200).withOpacity(0.8),
+              spreadRadius: 80,
+              blurRadius: 70,
+              offset: Offset(0, 5),
+            ),
+          ],
+        ),
+        child: BottomNavigationBar(
+          selectedItemColor: Colors.white,
+          unselectedItemColor: Colors.grey,
+          backgroundColor: Colors.transparent,
+          elevation: 100,
+          type: BottomNavigationBarType.fixed,
+          items: [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.category_outlined),
+              label: 'All',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.diversity_1_sharp),
+              label: 'Dress',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.houseboat_outlined),
+              label: 'Hat',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.watch),
+              label: 'Watch',
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildCardProduct(
+      String title, String label, double price, double star, String imgPath) {
+    return Card(
+      color: Colors.white, // Karta rangi
+      elevation: 4, // Karta ko'plab kengaytma
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15), // Karta shakli
+      ),
+      child: SizedBox(
+        // width: 200, // Karta kengligi
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Container(
+              height: 200, // Rasmning balandligi
+              width: double.infinity,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
+                image: DecorationImage(
+                  fit: BoxFit.cover,
+                  image: AssetImage(imgPath),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                  8, 8, 8, 8), // Yuqoridagi Paddingni o'zgartirdik
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    label,
+                    style: TextStyle(fontSize: 14, color: Colors.grey),
+                  ),
+                  SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Icon(Icons.attach_money),
+                      Text(
+                        price.toString(),
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      Spacer(),
+                      Icon(
+                        Icons.star,
+                        color: Colors.amber[300],
+                      ),
+                      Text(
+                        star.toString(),
+                        style: TextStyle(fontSize: 14),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -132,115 +275,55 @@ class IntroPage extends StatelessWidget {
         backgroundColor: backgroundColorBtn,
         padding: EdgeInsets.all(10),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(5),
+          borderRadius: BorderRadius.circular(10), // Border radius of 50
         ),
       ),
     );
   }
 }
 
-class DynamicCardGrid extends StatefulWidget {
-  @override
-  _DynamicCardGridState createState() => _DynamicCardGridState();
-}
-
-class _DynamicCardGridState extends State<DynamicCardGrid> {
-  List<Widget> cards = [];
-
-  @override
-  Widget build(BuildContext context) {
-    return GridView.builder(
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 10,
-      ),
-      itemCount: cards.length,
-      itemBuilder: (context, index) {
-        return cards[index];
-      },
-    );
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    addCards();
-  }
-
-  void addCards() {
-    for (int i = 0; i < 6; i++) {
-      cards.add(buildCardProduct('Title $i', 'Label $i', 20.0 + i,
-          4.0 - i * 0.5, 'assets/images/user.jpg'));
-    }
-  }
-
-  Widget buildCardProduct(
-      String title, String label, double price, double star, String imagePath) {
-    return Card(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Stack(
-            alignment: Alignment.topRight,
-            children: [
-              Image.asset(
-                width: 210,
-                height: 180,
-                imagePath,
-                fit: BoxFit.cover, // Rasmlarni kichik o'lchamda chiqarish
-              ),
-              IconButton(
-                onPressed: () {
-                  // Yuqori o'ng tomonda yurak iconi bosilganda amalni qo'shing
-                },
-                icon: Icon(Icons.favorite_border),
-                color: Colors.red,
-              ),
-            ],
-          ),
-          Padding(
-            padding: EdgeInsets.all(8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-                SizedBox(height: 8),
-                Text(
-                  label,
-                  style: TextStyle(
-                    color: Colors.grey,
-                  ),
-                ),
-                SizedBox(height: 8),
-                Text(
-                  '\$$price',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-                SizedBox(height: 8),
-                Row(
-                  children: List.generate(
-                    5,
-                    (index) => Icon(
-                      index < star ? Icons.star : Icons.star_border,
-                      color: Colors.amber,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
+List<Map<String, dynamic>> products = [
+  {
+    "title": "Product 1",
+    "label": "Label 1",
+    "price": 100.0,
+    "star": 4.5,
+    "imgPath": "assets/images/user.jpg",
+  },
+  {
+    "title": "Product 2",
+    "label": "Label 2",
+    "price": 150.0,
+    "star": 4.2,
+    "imgPath": "assets/images/product2.jpg",
+  },
+  {
+    "title": "Product 1",
+    "label": "Label 1",
+    "price": 100.0,
+    "star": 4.5,
+    "imgPath": "assets/images/product1.jpg",
+  },
+  {
+    "title": "Product 2",
+    "label": "Label 2",
+    "price": 150.0,
+    "star": 4.2,
+    "imgPath": "assets/images/product2.jpg",
+  },
+  {
+    "title": "Product 1",
+    "label": "Label 1",
+    "price": 100.0,
+    "star": 4.5,
+    "imgPath": "assets/images/product1.jpg",
+  },
+  {
+    "title": "Product 2",
+    "label": "Label 2",
+    "price": 150.0,
+    "star": 4.2,
+    "imgPath": "assets/images/product2.jpg",
+  },
+  // Add more products as needed
+];
