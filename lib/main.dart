@@ -14,11 +14,7 @@ class myApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(useMaterial3: true, primarySwatch: Colors.amber),
-      home: const IntroPage(),
-      routes: {
-        '/homepage': (context) => const HomePage(),
-        '/intropage': (context) => const IntroPage(),
-      },
+      home: IntroPage(),
     );
   }
 }
