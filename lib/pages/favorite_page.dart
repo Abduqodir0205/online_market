@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:routing_router/pages/product_details_page.dart';
 import '../prodacts.dart';
 
 class FavoritePage extends StatefulWidget {
@@ -16,30 +17,56 @@ class _FavoritePageState extends State<FavoritePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Yoqtirilgan"),
+        automaticallyImplyLeading: false,
       ),
       body: Container(
-        margin: EdgeInsets.symmetric(horizontal: 20),
+        margin: EdgeInsets.symmetric(horizontal: 10),
         child: (indexes.isEmpty || products.isEmpty) // Tekshirish
             ? Center(
                 child: Text("Yoqtirilgan mahsulotlar yo'q"),
               )
-            : ListView.builder(
-                itemCount: indexes.length,
-                itemBuilder: (context, index) {
-                  return FavoriteCard(
-                    title: products[index]["title"],
-                    label: products[index]["label"],
-                    price: products[index]["price"],
-                    star: products[index]["star"],
-                    imgPath: products[index]["imgPath"],
-                    quantity: quantities[index],
-                    onQuantityChanged: (newQuantity) {
-                      setState(() {
-                        quantities[index] = newQuantity;
-                      });
-                    },
-                  );
-                },
+            : Expanded(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    // Card o'lchamlari
+                    double cardWidth =
+                        169; // Karta o'lchamining o'zlashtirilgan eni
+                    double cardHeight = 340 -
+                        ((constraints.maxWidth + 300)).clamp(
+                            0, 40); // Karta o'lchamining o'zlashtirilgan bo'yi
+
+                    // Ekranning eni
+                    double screenWidth = constraints.maxWidth;
+
+                    // Kartalar soni
+                    int numberOfCards = (screenWidth / cardWidth).floor();
+
+                    // Kartalar sonini o'zgartirish
+                    numberOfCards = numberOfCards == 0 ? 1 : numberOfCards;
+
+                    return GridView.builder(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: numberOfCards,
+                        mainAxisSpacing: 10,
+                        crossAxisSpacing: 5,
+                        childAspectRatio: cardWidth /
+                            cardHeight, // Karta o'lchamining eni va bo'yi nisbati
+                      ),
+                      padding: EdgeInsets.symmetric(horizontal: 25),
+                      itemCount: indexes.length,
+                      itemBuilder: (context, index) {
+                        return ProductCard(
+                          title: products[index]["title"],
+                          label: products[index]["label"],
+                          price: products[index]["price"],
+                          star: products[index]["star"],
+                          imgPath: products[index]["imgPath"],
+                          index: index,
+                        );
+                      },
+                    );
+                  },
+                ),
               ),
       ),
     );

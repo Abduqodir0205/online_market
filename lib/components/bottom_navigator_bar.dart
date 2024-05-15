@@ -4,15 +4,18 @@ import 'package:routing_router/pages/favorite_page.dart';
 import 'package:routing_router/pages/intro_page.dart';
 import 'package:routing_router/pages/shop_bag.dart';
 import 'package:routing_router/pages/account_page.dart';
+import 'package:routing_router/prodacts.dart';
 
 class BottomNavigatorBar extends StatelessWidget {
   final int currentIndex;
   final Function(int) onTabTapped;
+  final bool isAddToCartPressed;
 
   const BottomNavigatorBar({
     Key? key,
     required this.currentIndex,
     required this.onTabTapped,
+    required this.isAddToCartPressed,
   }) : super(key: key);
 
   @override
@@ -45,7 +48,24 @@ class BottomNavigatorBar extends StatelessWidget {
             label: 'Uy',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_bag),
+            icon: Stack(
+              children: [
+                Icon(Icons.shopping_bag),
+                if (isAddToCartPressed)
+                  Positioned(
+                    top: 0,
+                    right: 0,
+                    child: Container(
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.red,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
             label: 'Savat',
           ),
           BottomNavigationBarItem(
@@ -55,7 +75,6 @@ class BottomNavigatorBar extends StatelessWidget {
           BottomNavigationBarItem(
             icon: Icon(Icons.add),
             label: 'Qo\'shish',
-            
           ),
         ],
       ),
@@ -72,6 +91,7 @@ class YourParentWidget extends StatefulWidget {
 
 class _YourParentWidgetState extends State<YourParentWidget> {
   int _currentIndex = 0;
+  bool _isAddToCartPressed = false;
 
   @override
   Widget build(BuildContext context) {
@@ -80,6 +100,7 @@ class _YourParentWidgetState extends State<YourParentWidget> {
       bottomNavigationBar: BottomNavigatorBar(
         currentIndex: _currentIndex,
         onTabTapped: _onTabTapped,
+        isAddToCartPressed: _isAddToCartPressed,
       ),
     );
   }
@@ -102,6 +123,7 @@ class _YourParentWidgetState extends State<YourParentWidget> {
   void _onTabTapped(int index) {
     setState(() {
       _currentIndex = index;
+      _isAddToCartPressed = (index == 1);
     });
   }
 }

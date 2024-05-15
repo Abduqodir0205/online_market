@@ -11,6 +11,7 @@ class AdminPage extends StatefulWidget {
 }
 
 class _AdminPageState extends State<AdminPage> {
+  TextEditingController caategoryController = TextEditingController();
   TextEditingController titleController = TextEditingController();
   TextEditingController labelController = TextEditingController();
   TextEditingController priceController = TextEditingController();
@@ -40,6 +41,10 @@ class _AdminPageState extends State<AdminPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               TextField(
+                controller: caategoryController,
+                decoration: InputDecoration(labelText: 'Category'),
+              ),
+              TextField(
                 controller: titleController,
                 decoration: InputDecoration(labelText: 'Title'),
               ),
@@ -64,6 +69,7 @@ class _AdminPageState extends State<AdminPage> {
                 onPressed: () {
                   // Yangi mahsulotni yaratish
                   Map<String, dynamic> newProduct = {
+                    "category": caategoryController,
                     "title": titleController.text,
                     "label": labelController.text,
                     "price": double.parse(priceController.text),
@@ -73,6 +79,7 @@ class _AdminPageState extends State<AdminPage> {
                   // Yangi mahsulotni products ro'yxatiga qo'shamiz
                   products.add(newProduct);
                   // TextFieldlarni tozalash
+                  caategoryController.clear();
                   titleController.clear();
                   labelController.clear();
                   priceController.clear();

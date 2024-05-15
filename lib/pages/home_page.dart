@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:routing_router/pages/product_details_page.dart';
-import 'package:routing_router/prodacts.dart';
 import '../components/user_acc.dart';
 import '../components/bottom_navigator_bar.dart';
-import './shop_bag.dart'; // Import ShopBag page
-import './favorite_page.dart'; // Import FavoritePage
-import './login_page.dart'; // Import LoginPage
+import './shop_bag.dart'; // ShopBag sahifasini import qilish
+import './favorite_page.dart'; // FavoritePage sahifasini import qilish
+import './login_page.dart'; // LoginPage sahifasini import qilish
+import '../pages/product_details_page.dart'; // ProductDetailsPage sahifasini import qilish
+import '../prodacts.dart';
 
 class IntroPage extends StatefulWidget {
   const IntroPage({Key? key}) : super(key: key);
@@ -17,15 +16,16 @@ class IntroPage extends StatefulWidget {
 
 class _IntroPageState extends State<IntroPage> {
   int _currentIndex = 0;
-  TextEditingController _searchController =
-      TextEditingController(); // Controller for TextField
+  String _selectedCategory = ""; // Tanlangan kategoriya
   List<Map<String, dynamic>> filteredProducts =
-      List.from(products); // Initialize filteredProducts
+      List.from(products); // Filtrlangan mahsulotlar ro'yxati
+
+  TextEditingController _searchController =
+      TextEditingController(); // TextField uchun controller
 
   @override
   void dispose() {
-    _searchController
-        .dispose(); // Dispose the controller when the widget is disposed
+    _searchController.dispose(); // O'chirish
     super.dispose();
   }
 
@@ -36,6 +36,7 @@ class _IntroPageState extends State<IntroPage> {
       bottomNavigationBar: BottomNavigatorBar(
         currentIndex: _currentIndex,
         onTabTapped: _onTabTapped,
+        isAddToCartPressed: indexes_card.length > 0,
       ),
     );
   }
@@ -43,15 +44,15 @@ class _IntroPageState extends State<IntroPage> {
   Widget _getBody() {
     switch (_currentIndex) {
       case 0:
-        return buildCardPositions(context); // Display IntroPage content
+        return buildCardPositions(context); // IntroPage tarkibini ko'rsatish
       case 1:
-        return ShopBag(); // Display ShopBagPage content
+        return ShopBag(); // ShopBagPage tarkibini ko'rsatish
       case 2:
-        return FavoritePage(); // Display FavoritePage content
+        return FavoritePage(); // FavoritePage tarkibini ko'rsatish
       case 3:
-        return LoginPage(); // Display AccountPage content
+        return LoginPage(); // AccountPage tarkibini ko'rsatish
       default:
-        return Container(); // Return a default widget if necessary
+        return Container(); // Agar kerak bo'lsa sukutli widgetni qaytarish
     }
   }
 
@@ -61,14 +62,11 @@ class _IntroPageState extends State<IntroPage> {
     });
   }
 
-  Widget buildElevatedButton(String text, IconData icon) {
+  Widget buildElevatedButton(String text, String icon) {
     return ElevatedButton(
       child: Row(
         children: <Widget>[
-          Icon(
-            icon,
-            color: Colors.black,
-          ),
+          Image.network(icon),
           SizedBox(
             width: 10,
           ),
@@ -94,7 +92,7 @@ class _IntroPageState extends State<IntroPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          margin: EdgeInsets.symmetric(horizontal: 25, vertical: 20),
+          margin: EdgeInsets.symmetric(horizontal: 25, vertical: 30),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
@@ -106,7 +104,8 @@ class _IntroPageState extends State<IntroPage> {
                     child: SizedBox(
                       height: 50,
                       child: TextField(
-                        controller: _searchController, // Assign the controller
+                        controller:
+                            _searchController, // Controller ni o'zlashtirish
                         style: TextStyle(fontSize: 16),
                         decoration: InputDecoration(
                           border: OutlineInputBorder(
@@ -136,7 +135,9 @@ class _IntroPageState extends State<IntroPage> {
                   SizedBox(
                     height: 50,
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        _showCategoryDialog(context);
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color.fromARGB(255, 31, 31, 31),
                         padding: EdgeInsets.all(0),
@@ -158,64 +159,31 @@ class _IntroPageState extends State<IntroPage> {
             ],
           ),
         ),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Padding(
-            padding: const EdgeInsets.only(left: 20, bottom: 6),
-            child: Row(
-              children: <Widget>[
-                buildElevatedButton("jahfbda", Icons.add),
-                SizedBox(
-                  width: 10,
-                ),
-                buildElevatedButton("jahfbda", Icons.add),
-                SizedBox(
-                  width: 10,
-                ),
-                buildElevatedButton("jahfbda", Icons.add),
-                SizedBox(
-                  width: 10,
-                ),
-                buildElevatedButton("jahfbda", Icons.add),
-                SizedBox(
-                  width: 10,
-                ),
-                buildElevatedButton("jahfbda", Icons.add),
-                SizedBox(
-                  width: 10,
-                ),
-                buildElevatedButton("jahfbda", Icons.add),
-                SizedBox(
-                  width: 10,
-                ),
-                buildElevatedButton("jahfbda", Icons.add)
-              ],
-            ),
-          ),
-        ),
         Expanded(
           child: LayoutBuilder(
             builder: (context, constraints) {
-              // Card dimensions
-              double cardWidth = 200; // Fixed width of your card
-              double cardHeight = 280; // Fixed height of your card
+              // Card o'lchamlari
+              double cardWidth = 180; // Karta o'lchamining o'zlashtirilgan eni
+              double cardHeight = 330 -
+                  ((constraints.maxWidth + 250))
+                      .clamp(0, 20); // Karta o'lchamining o'zlashtirilgan bo'yi
 
-              // Screen width
+              // Ekranning eni
               double screenWidth = constraints.maxWidth;
 
-              // Number of cards
+              // Kartalar soni
               int numberOfCards = (screenWidth / cardWidth).floor();
 
-              // Adjust number of cards
+              // Kartalar sonini o'zgartirish
               numberOfCards = numberOfCards == 0 ? 1 : numberOfCards;
 
               return GridView.builder(
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: numberOfCards,
                   mainAxisSpacing: 10,
-                  crossAxisSpacing: 10,
+                  crossAxisSpacing: 5,
                   childAspectRatio: cardWidth /
-                      cardHeight, // width / height ratio of your card
+                      cardHeight, // Karta o'lchamining eni va bo'yi nisbati
                 ),
                 padding: EdgeInsets.symmetric(horizontal: 25),
                 itemCount: filteredProducts.length,
@@ -234,6 +202,54 @@ class _IntroPageState extends State<IntroPage> {
           ),
         ),
       ],
+    );
+  }
+
+  // Kategoriya modal oynasini ko'rsatish uchun funktsiya
+  Future<void> _showCategoryDialog(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Kategoriyani tanlang'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                _buildCategoryItem(
+                    "Hammasi"), // Barcha mahsulotlar uchun kategoriya
+                _buildCategoryItem("Kurtka"),
+                _buildCategoryItem("Futbolka"),
+                _buildCategoryItem("Shim"),
+                _buildCategoryItem("Ko'ylak"),
+                _buildCategoryItem("So'mka"),
+                // Qo'shimcha kategoriyalar
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // Kategoriya tanlovini qurish uchun qism
+  Widget _buildCategoryItem(String category) {
+    return ListTile(
+      title: Text(category),
+      onTap: () {
+        setState(() {
+          _selectedCategory = category;
+          if (_selectedCategory == "Hammasi") {
+            filteredProducts = List.from(products); // Barcha mahsulotlar
+          } else {
+            filteredProducts = products
+                .where((product) =>
+                    product['category'].toString().toLowerCase() ==
+                    _selectedCategory.toLowerCase())
+                .toList(); // Tanlangan kategoriyaga mos keladigan mahsulotlar
+          }
+        });
+        Navigator.of(context).pop(); // Modal oynani yopish
+      },
     );
   }
 }
